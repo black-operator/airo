@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}{{ 'Persona bearbeiten' if persona else 'Persona erstellen' }} · AIRO{% endblock %}
+{% block content %}
+<div class="editor-shell">
+  <header class="page-header editor-header"><div><a class="back-link" href="{{ url_for('personas.list_personas') }}">← Personas</a><h1>{{ 'Persona bearbeiten' if persona else 'Neue Persona' }}</h1></div></header>
+  <form method="post" enctype="multipart/form-data" class="editor-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <aside class="editor-preview"><div class="avatar-upload" data-avatar-upload>{{ avatar(persona or {'name': '?'}, 'xxl') }}<label class="button button--ghost button--small">Bild wählen<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" hidden data-avatar-input></label></div><p class="field-help">Jeder Chat kann eine andere Persona verwenden.</p>
+      {% if persona %}<div class="danger-zone"><p>Bestehende Chats behalten ihre Kopie.</p><button class="quiet-link quiet-link--danger" type="submit" form="delete-persona" data-confirm="Persona wirklich löschen?">Persona löschen</button></div>{% endif %}
+    </aside>
+    <div class="form-sections">
+      <section class="form-section"><div class="form-section__heading"><span>01</span><div><h2>Identität</h2><p>Wie der Charakter dich wahrnimmt.</p></div></div><div class="field-grid"><label>Name<input name="name" maxlength="60" value="{{ persona.name if persona else '' }}" required></label><label>Pronomen<input name="pronouns" maxlength="80" value="{{ persona.pronouns if persona else '' }}" placeholder="z. B. sie/ihr"></label></div><label>Aussehen<textarea name="appearance" rows="5">{{ persona.appearance if persona else '' }}</textarea></label></section>
+      <section class="form-section"><div class="form-section__heading"><span>02</span><div><h2>Hintergrund</h2><p>Genug Kontext für glaubwürdige Reaktionen.</p></div></div><label>Persönlichkeit<textarea name="personality" rows="6">{{ persona.personality if persona else '' }}</textarea></label><label>Hintergrund<textarea name="background" rows="6">{{ persona.background if persona else '' }}</textarea></label><label>Beziehung zum Charakter<textarea name="relationship" rows="4" placeholder="Kann im konkreten Chat als Ausgangspunkt dienen">{{ persona.relationship if persona else '' }}</textarea></label></section>
+      <section class="form-section"><div class="form-section__heading"><span>03</span><div><h2>Zusätzlicher Kontext</h2><p>Private Hinweise für das Modell.</p></div></div><label>Anweisungen<textarea name="instructions" rows="5">{{ persona.instructions if persona else '' }}</textarea></label></section>
+      <div class="sticky-save"><span></span><button class="button button--primary" type="submit">{{ 'Speichern' if persona else 'Persona erstellen' }}</button></div>
+    </div>
+  </form>
+  {% if persona %}<form id="delete-persona" action="{{ url_for('personas.delete_persona', persona_id=persona._id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>{% endif %}
+</div>
+{% endblock %}

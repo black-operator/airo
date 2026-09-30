@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}Charaktere · AIRO{% endblock %}
+{% block content %}
+<div class="page-shell page-shell--narrow">
+  <header class="page-header"><div><div class="eyebrow">Bibliothek</div><h1>Charaktere</h1></div><a class="button button--primary" href="{{ url_for('characters.create_character') }}">＋ Neu</a></header>
+  {% if characters %}
+  <div class="entity-list">
+    {% for character in characters %}
+    <article class="entity-row">
+      {{ avatar(character, 'lg') }}
+      <div class="entity-row__copy"><h2>{{ character.name }}</h2><p>{{ character.tagline or 'Keine Kurzbeschreibung' }}</p></div>
+      <a class="button button--ghost" href="{{ url_for('chat.start_conversation', character_id=character._id) }}">Chatten</a>
+      <a class="icon-button" href="{{ url_for('characters.edit_character', character_id=character._id) }}" aria-label="{{ character.name }} bearbeiten">⋯</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <section class="empty-state"><span class="empty-state__mark">◇</span><h2>Noch keine Charaktere</h2><p>Beginne mit einer Stimme, die du wirklich kennenlernen willst.</p><a class="button button--primary" href="{{ url_for('characters.create_character') }}">Charakter erstellen</a></section>
+  {% endif %}
+</div>
+{% endblock %}

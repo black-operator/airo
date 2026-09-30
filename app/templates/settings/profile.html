@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}Profil · AIRO{% endblock %}
+{% block content %}
+<div class="page-shell page-shell--compact"><header class="page-header"><div><div class="eyebrow">Einstellungen</div><h1>Dein Profil</h1></div></header><form method="post" enctype="multipart/form-data" class="settings-card"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="profile-avatar-row" data-avatar-upload>{{ avatar(profile, 'xxl') }}<div><label class="button button--ghost">Bild wählen<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" hidden data-avatar-input></label><p class="field-help">JPG, PNG oder WebP · maximal 8 MB</p></div></div><label>Anzeigename<input name="display_name" maxlength="40" value="{{ profile.display_name }}" required></label><label>Benutzername<input value="{{ profile.username }}" disabled><span class="field-help">Der Benutzername bleibt unverändert.</span></label><div class="form-actions"><button class="button button--primary" type="submit">Profil speichern</button></div></form></div>
+{% endblock %}

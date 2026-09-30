@@ -1,0 +1,71 @@
+{% from 'macros.html' import avatar %}
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="color-scheme" content="dark light">
+  <title>{% block title %}AIRO{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% if current_user.is_authenticated %}app-body{% else %}auth-body{% endif %}">
+  {% if current_user.is_authenticated %}
+    <button class="mobile-nav-toggle icon-button" type="button" data-nav-toggle aria-label="Navigation öffnen">☰</button>
+    <aside class="sidebar" data-sidebar>
+      <div class="brand-row">
+        <a class="brand" href="{{ url_for('main.dashboard') }}" aria-label="AIRO Startseite">
+          <span class="brand-mark">A</span><span>AIRO</span>
+        </a>
+        <button class="icon-button mobile-only" type="button" data-nav-toggle aria-label="Navigation schließen">×</button>
+      </div>
+      <nav class="primary-nav" aria-label="Hauptnavigation">
+        <a class="nav-link {% if request.endpoint == 'main.dashboard' %}is-active{% endif %}" href="{{ url_for('main.dashboard') }}"><span>⌂</span> Übersicht</a>
+        <a class="nav-link {% if request.blueprint == 'characters' %}is-active{% endif %}" href="{{ url_for('characters.list_characters') }}"><span>◇</span> Charaktere</a>
+        <a class="nav-link {% if request.blueprint == 'personas' %}is-active{% endif %}" href="{{ url_for('personas.list_personas') }}"><span>◯</span> Personas</a>
+      </nav>
+      <section class="sidebar-chats" aria-label="Letzte Chats">
+        <div class="sidebar-section-heading"><span>Letzte Chats</span><span>{{ sidebar_conversations|length }}</span></div>
+        <div class="sidebar-chat-list">
+          {% for item in sidebar_conversations %}
+            {% set chat_character = item.character_snapshot %}
+            <a class="sidebar-chat {% if request.view_args and request.view_args.get('conversation_id') == item._id|string %}is-active{% endif %}" href="{{ url_for('chat.conversation', conversation_id=item._id) }}">
+              {{ avatar(chat_character, 'sm') }}
+              <span class="sidebar-chat__copy"><strong>{{ item.title }}</strong><small>{% if item.persona_snapshot %}als {{ item.persona_snapshot.name }}{% else %}Ohne Persona{% endif %}</small></span>
+            </a>
+          {% else %}
+            <p class="sidebar-empty">Deine Unterhaltungen erscheinen hier.</p>
+          {% endfor %}
+        </div>
+      </section>
+      <div class="sidebar-footer">
+        <a class="profile-chip" href="{{ url_for('main.profile_settings') }}">
+          {{ avatar(current_user, 'sm') }}
+          <span><strong>{{ current_user.display_name }}</strong><small>@{{ current_user.username }}</small></span>
+        </a>
+        <div class="footer-actions">
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Farbschema wechseln">◐</button>
+          <form action="{{ url_for('auth.logout') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="icon-button" type="submit" aria-label="Abmelden">↗</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+  {% endif %}
+
+  <main class="{% if current_user.is_authenticated %}app-main{% else %}auth-main{% endif %}">
+    <div class="flash-stack" aria-live="polite">
+      {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="flash flash--{{ category }}">{{ message }}<button type="button" data-dismiss aria-label="Meldung schließen">×</button></div>
+      {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+  <div class="nav-scrim" data-nav-scrim></div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

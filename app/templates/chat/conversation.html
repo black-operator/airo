@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}{{ character.name }} · AIRO{% endblock %}
+{% block head %}<script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>{% endblock %}
+{% block content %}
+<div class="chat-layout" data-chat data-conversation-id="{{ conversation._id }}">
+  <section class="chat-panel">
+    <header class="chat-header">
+      <a class="icon-button" href="{{ url_for('main.dashboard') }}" aria-label="Zur Übersicht">←</a>
+      {{ avatar(character, 'sm') }}
+      <div class="chat-header__identity"><strong>{{ character.name }}</strong><span data-model-state><i></i> Modell prüfen …</span></div>
+      <button class="icon-button" type="button" data-details-toggle aria-label="Chatdetails anzeigen" aria-expanded="true">•••</button>
+    </header>
+    <div class="message-scroll" data-message-scroll>
+      <div class="message-list" data-message-list aria-live="polite">
+        {% for message in messages %}
+          <article class="message message--{{ message.role }} {% if message.status == 'interrupted' %}is-interrupted{% endif %}">
+            <div class="message__label">{{ character.name if message.role == 'assistant' else (persona.name if persona else current_user.display_name) }}</div>
+            <div class="message__content">{{ message.content|chat_markdown }}</div>
+            {% if message.status == 'interrupted' %}<span class="message__status">Unterbrochen</span>{% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="composer-wrap">
+      <div class="generation-error" data-generation-error hidden></div>
+      <form class="composer" data-composer>
+        <textarea name="content" rows="1" maxlength="12000" placeholder="Schreibe als {{ persona.name if persona else current_user.display_name }} …" aria-label="Nachricht" data-composer-input></textarea>
+        <div class="composer__actions">
+          <span class="composer__hint">Enter senden · Shift + Enter Zeile</span>
+          <button class="send-button" type="submit" aria-label="Senden" data-send>↑</button>
+          <button class="send-button send-button--stop" type="button" aria-label="Antwort stoppen" data-stop hidden>■</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <aside class="details-panel" data-details-panel>
+    <div class="details-panel__header"><span>Chatdetails</span><button class="icon-button" type="button" data-details-toggle aria-label="Chatdetails schließen" aria-expanded="true">×</button></div>
+    <div class="details-character">{{ avatar(character, 'xl') }}<h2>{{ character.name }}</h2><p>{{ character.tagline }}</p></div>
+    {% if persona %}<div class="detail-block"><span>Du schreibst als</span><div class="detail-persona">{{ avatar(persona, 'sm') }}<div><strong>{{ persona.name }}</strong><small>{{ persona.pronouns }}</small></div></div></div>{% endif %}
+    {% if character.scenario %}<div class="detail-block"><span>Szenario</span><p>{{ character.scenario }}</p></div>{% endif %}
+    <div class="details-panel__spacer"></div>
+    <form action="{{ url_for('chat.delete_conversation', conversation_id=conversation._id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="quiet-link quiet-link--danger" type="submit" data-confirm="Diesen Chat wirklich löschen?">Chat löschen</button></form>
+  </aside>
+</div>
+{% endblock %}

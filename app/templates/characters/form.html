@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}{{ 'Charakter bearbeiten' if character else 'Charakter erstellen' }} · AIRO{% endblock %}
+{% block content %}
+<div class="editor-shell">
+  <header class="page-header editor-header">
+    <div><a class="back-link" href="{{ url_for('characters.list_characters') }}">← Charaktere</a><h1>{{ 'Charakter bearbeiten' if character else 'Neuer Charakter' }}</h1></div>
+    {% if character %}<a class="button button--ghost" href="{{ url_for('chat.start_conversation', character_id=character._id) }}">Chat starten</a>{% endif %}
+  </header>
+  <form method="post" enctype="multipart/form-data" class="editor-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <aside class="editor-preview">
+      <div class="avatar-upload" data-avatar-upload>
+        {{ avatar(character or {'name': '?'}, 'xxl') }}
+        <label class="button button--ghost button--small">Bild wählen<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" hidden data-avatar-input></label>
+      </div>
+      <p class="field-help">Wird automatisch quadratisch zugeschnitten.</p>
+      {% if character %}
+      <div class="danger-zone">
+        <p>Löscht auch alle Chats mit diesem Charakter.</p>
+        <button class="quiet-link quiet-link--danger" type="submit" form="delete-character" data-confirm="Charakter und alle zugehörigen Chats wirklich löschen?">Charakter löschen</button>
+      </div>
+      {% endif %}
+    </aside>
+    <div class="form-sections">
+      <section class="form-section"><div class="form-section__heading"><span>01</span><div><h2>Identität</h2><p>Das sieht man zuerst.</p></div></div>
+        <div class="field-grid"><label>Name<input name="name" maxlength="60" value="{{ character.name if character else '' }}" required></label><label>Kurzbeschreibung<input name="tagline" maxlength="160" value="{{ character.tagline if character else '' }}" placeholder="Ein Satz, der neugierig macht"></label></div>
+        <label>Erste Nachricht<textarea name="greeting" rows="5" required placeholder="Wie beginnt der Charakter das Gespräch?">{{ character.greeting if character else '' }}</textarea></label>
+      </section>
+      <section class="form-section"><div class="form-section__heading"><span>02</span><div><h2>Charakter</h2><p>Die innere Logik der Rolle.</p></div></div>
+        <label>Persönlichkeit<textarea name="personality" rows="7" placeholder="Temperament, Werte, Eigenheiten, Ziele …">{{ character.personality if character else '' }}</textarea></label>
+        <label>Sprachstil<textarea name="speaking_style" rows="4" placeholder="Wortwahl, Rhythmus, Humor, typische Formulierungen …">{{ character.speaking_style if character else '' }}</textarea></label>
+        <label>Szenario<textarea name="scenario" rows="6" placeholder="Ort, Zeit, Ausgangssituation und Beziehung zum Nutzer …">{{ character.scenario if character else '' }}</textarea></label>
+      </section>
+      <section class="form-section"><div class="form-section__heading"><span>03</span><div><h2>Feinschliff</h2><p>Optional, aber wirkungsvoll.</p></div></div>
+        <label>Beispielgespräche<textarea name="examples" rows="7" placeholder="User: …&#10;Character: …">{{ character.examples if character else '' }}</textarea></label>
+        <label>Zusätzliche Anweisungen<textarea name="instructions" rows="5" placeholder="Regeln oder Details, die sonst nirgends passen">{{ character.instructions if character else '' }}</textarea></label>
+        <label>Antwortlänge<select name="reply_length"><option value="short" {% if character and character.reply_length == 'short' %}selected{% endif %}>Kurz</option><option value="balanced" {% if not character or character.reply_length == 'balanced' %}selected{% endif %}>Ausgewogen</option><option value="long" {% if character and character.reply_length == 'long' %}selected{% endif %}>Ausführlich</option></select></label>
+      </section>
+      <div class="sticky-save"><span class="muted">Änderungen gelten für neue Chats.</span><button class="button button--primary" type="submit">{{ 'Speichern' if character else 'Charakter erstellen' }}</button></div>
+    </div>
+  </form>
+  {% if character %}<form id="delete-character" action="{{ url_for('characters.delete_character', character_id=character._id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>{% endif %}
+</div>
+{% endblock %}

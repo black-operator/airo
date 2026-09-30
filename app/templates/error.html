@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}{{ code }} · AIRO{% endblock %}
+{% block content %}
+<section class="empty-state error-state"><div class="eyebrow">Fehler {{ code }}</div><h1>{{ message }}</h1><a class="button" href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">Zurück</a></section>
+{% endblock %}

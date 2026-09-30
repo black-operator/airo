@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}Chat mit {{ character.name }} · AIRO{% endblock %}
+{% block content %}
+<div class="start-chat-shell">
+  <a class="back-link" href="{{ url_for('main.dashboard') }}">← Zurück</a>
+  <section class="start-chat-card">
+    {{ avatar(character, 'hero') }}
+    <div class="eyebrow">Neuer Chat</div>
+    <h1>{{ character.name }}</h1>
+    <p>{{ character.tagline or 'Eine neue Unterhaltung beginnt.' }}</p>
+    <form method="post" class="start-chat-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <fieldset>
+        <legend>Wer bist du in diesem Chat?</legend>
+        <label class="persona-option">
+          <input type="radio" name="persona_id" value="" {% if not personas %}checked{% endif %}>
+          <span class="avatar avatar--md"><span>DU</span></span>
+          <span><strong>Ohne Persona</strong><small>Nur dein Anzeigename</small></span>
+          <i></i>
+        </label>
+        {% for persona in personas %}
+        <label class="persona-option">
+          <input type="radio" name="persona_id" value="{{ persona._id }}" {% if loop.first %}checked{% endif %}>
+          {{ avatar(persona, 'md') }}
+          <span><strong>{{ persona.name }}</strong><small>{{ persona.pronouns or persona.personality|truncate(60) or 'Eigene Rolle' }}</small></span>
+          <i></i>
+        </label>
+        {% endfor %}
+      </fieldset>
+      <button class="button button--primary button--full" type="submit">Unterhaltung öffnen</button>
+    </form>
+    <a class="quiet-link" href="{{ url_for('personas.create_persona') }}">＋ Neue Persona erstellen</a>
+  </section>
+</div>
+{% endblock %}

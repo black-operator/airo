@@ -1,0 +1,10 @@
+{% macro avatar(item, size='md', label=None) -%}
+  {% set name = label or item.name or item.display_name or item.username or '?' %}
+  <span class="avatar avatar--{{ size }}" aria-hidden="true">
+    {% if item.avatar %}
+      <img src="{{ url_for('static', filename='uploads/' ~ item.avatar) }}" alt="">
+    {% else %}
+      <span>{{ name[:2]|upper }}</span>
+    {% endif %}
+  </span>
+{%- endmacro %}

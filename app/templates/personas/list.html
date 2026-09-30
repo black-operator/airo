@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import avatar %}
+{% block title %}Personas · AIRO{% endblock %}
+{% block content %}
+<div class="page-shell page-shell--narrow">
+  <header class="page-header"><div><div class="eyebrow">Deine Rollen</div><h1>Personas</h1></div><a class="button button--primary" href="{{ url_for('personas.create_persona') }}">＋ Neu</a></header>
+  {% if personas %}<div class="entity-list">
+    {% for persona in personas %}<article class="entity-row">{{ avatar(persona, 'lg') }}<div class="entity-row__copy"><h2>{{ persona.name }}</h2><p>{{ persona.pronouns or persona.personality|truncate(100) or 'Bereit für eine neue Rolle.' }}</p></div><a class="button button--ghost" href="{{ url_for('personas.edit_persona', persona_id=persona._id) }}">Bearbeiten</a></article>{% endfor %}
+  </div>{% else %}<section class="empty-state"><span class="empty-state__mark">◯</span><h2>Wer möchtest du sein?</h2><p>Personas geben Charakteren Kontext darüber, mit wem sie sprechen.</p><a class="button button--primary" href="{{ url_for('personas.create_persona') }}">Persona erstellen</a></section>{% endif %}
+</div>
+{% endblock %}

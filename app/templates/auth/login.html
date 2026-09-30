@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Anmelden · AIRO{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-brand"><span class="brand-mark brand-mark--large">A</span><span>AIRO</span></div>
+  <div class="auth-card">
+    <div class="eyebrow">Willkommen zurück</div>
+    <h1>Anmelden</h1>
+    <p class="muted">Deine Charaktere warten dort, wo du sie verlassen hast.</p>
+    <form method="post" class="stack-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Benutzername<input name="username" autocomplete="username" required autofocus></label>
+      <label>Passwort<input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="button button--primary button--full" type="submit">Anmelden</button>
+    </form>
+    <p class="auth-switch">Noch kein Account? <a href="{{ url_for('auth.signup') }}">Account erstellen</a></p>
+  </div>
+</section>
+{% endblock %}
